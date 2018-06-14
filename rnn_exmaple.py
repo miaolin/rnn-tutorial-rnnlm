@@ -80,17 +80,18 @@ def main():
     # try rnn model
     np.random.seed(10)
     model = rnn_numpy(vocabulary_size)
-    #o, s = model.forward_propagation(X_train[10])
-    #print(o.shape)
-    #print(o)
-
-    #predictions = model.predict(X_train[10])
-    #print(predictions.shape)
-    #print(predictions)
 
     # checkt the loss
     print("Expected Loss for random predictions: {}".format(np.log(vocabulary_size)))
     print("Actual loss: {}".format(model.calculate_loss(X_train[:10000], y_train[:10000])))
+
+
+    # check the gradient calculation
+    grad_check_vocab_size = 100
+    np.random.seed(10)
+    model = rnn_numpy(grad_check_vocab_size, 10, bptt_truncate=5)
+    model.gradient_check([0, 1, 2, 3], [1, 2, 3, 4])
+
 
 if __name__ == "__main__":
     main()

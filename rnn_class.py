@@ -32,7 +32,7 @@ class rnn_numpy:
         return [o, s]
 
     def predict(self, x):
-        # perform forward progpagation and return index of the hightest score
+        # perform forward propagation and return index of the hightest score
         o, s = self.forward_propagation(x)
         return np.argmax(o, axis=1)
 
@@ -66,7 +66,7 @@ class rnn_numpy:
             # initial delta calculation
             delta_t = self.V.T.dot(delta_o[t]) * (1 - (s[t] ** 2))
 
-            # backpropagation throught time
+            # backpropagation through time
             for bptt_step in np.arange(max(0, t-self.bptt_truncate), t+1)[::-1]:
                 dLdW += np.outer(delta_t, s[bptt_step-1])
                 dLdU[:, x[bptt_step]] += delta_t
@@ -84,7 +84,9 @@ class rnn_numpy:
         # Gradient check for each parameter
         for pidx, pname in enumerate(model_parameters):
             # Get the actual parameter value from the mode, e.g. model.W
-            parameter = operator.attrgetter(pname)(self)
+
+            # parameter = operator.attrgetter(pname)(self)
+            parameter = self.__getattribute__(pname)
             print("Performing gradient check for parameter {} with size {}.".format(pname, np.prod(parameter.shape)))
 
             # Iterate over each element of the parameter matrix, e.g. (0,0), (0,1), ...
@@ -93,6 +95,7 @@ class rnn_numpy:
                 ix = it.multi_index
                 # Save the original value so we can reset it later
                 original_value = parameter[ix]
+
                 # Estimate the gradient using (f(x+h) - f(x-h))/(2*h)
                 parameter[ix] = original_value + h
                 gradplus = self.calculate_total_loss([x], [y])
@@ -104,15 +107,15 @@ class rnn_numpy:
 
                 # The gradient for this parameter calculated using backpropagation
                 backprop_gradient = bptt_gradients[pidx][ix]
-                relative_error = relative_error(backprop_gradient, estimated_gradient)
-                # If the error is to large fail the gradient check
-                if relative_error > error_threshold:
+                error_value = relative_error(backprop_gradient, estimated_gradient)
+                # If the error is to large fail the gradient check´
+                if error_value > error_threshold:
                     print("Gradient Check ERROR: parameter={} ix={}".format(pname, ix))
                     print("+h Loss: {}".format(gradplus))
                     print("-h Loss: {}".format(gradminus))
                     print("Estimated_gradient: {}".format(estimated_gradient))
                     print("Backpropagation gradient: {}".format(backprop_gradient))
-                    print("Relative Error: {}".format(relative_error))
+                    print("Relative Error: {}".format(error_value))
                     return
                 it.iternext()
             print("Gradient check for parameter {} passed.".format(pname))
