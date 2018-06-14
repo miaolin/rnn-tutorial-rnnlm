@@ -1,10 +1,11 @@
 import csv
 import itertools
-import operator
 import numpy as np
 import nltk
 import sys
 from datetime import datetime
+
+from rnn_class import rnn_numpy
 
 
 vocabulary_size = 8000
@@ -68,13 +69,28 @@ def main():
     data_path = "data/reddit-comments-2015-08.csv"
     sentences = read_data(data_path)
     tokenized_sentences, index_to_word, word_to_index = preprocessing(sentences)
-
     X_train, y_train = generate_train_data(tokenized_sentences, word_to_index)
 
     # Print an training data example
-    x_example, y_example = X_train[17], y_train[17]
+    x_example, y_example = X_train[10], y_train[10]
     print("x:\n%s\n%s" % (" ".join([index_to_word[x] for x in x_example]), x_example))
     print("\ny:\n%s\n%s" % (" ".join([index_to_word[x] for x in y_example]), y_example))
+
+
+    # try rnn model
+    np.random.seed(10)
+    model = rnn_numpy(vocabulary_size)
+    #o, s = model.forward_propagation(X_train[10])
+    #print(o.shape)
+    #print(o)
+
+    #predictions = model.predict(X_train[10])
+    #print(predictions.shape)
+    #print(predictions)
+
+    # checkt the loss
+    print("Expected Loss for random predictions: {}".format(np.log(vocabulary_size)))
+    print("Actual loss: {}".format(model.calculate_loss(X_train[:10000], y_train[:10000])))
 
 if __name__ == "__main__":
     main()
