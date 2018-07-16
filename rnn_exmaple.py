@@ -2,9 +2,6 @@ import csv
 import itertools
 import numpy as np
 import nltk
-import sys
-from datetime import datetime
-
 from rnn_class import rnn_numpy
 
 
@@ -17,7 +14,7 @@ sentence_end_token = "SENTENCE_END"
 # Read the data and append SENTENCE_START and SENTENCE_END tokens
 def read_data(data_path):
     print("Reading CSV file...")
-    with open(data_path, 'r') as f:
+    with open(data_path, 'r', encoding="utf-8") as f:
         reader = csv.reader(f, skipinitialspace=True)
         next(reader)
 
@@ -32,7 +29,6 @@ def read_data(data_path):
 
 
 def preprocessing(sentences):
-
     tokenized_sentences = [nltk.word_tokenize(sent) for sent in sentences]
 
     # Count the word frequencies
@@ -76,7 +72,6 @@ def main():
     print("x:\n%s\n%s" % (" ".join([index_to_word[x] for x in x_example]), x_example))
     print("\ny:\n%s\n%s" % (" ".join([index_to_word[x] for x in y_example]), y_example))
 
-
     # try rnn model
     np.random.seed(10)
     model = rnn_numpy(vocabulary_size)
@@ -84,7 +79,6 @@ def main():
     # checkt the loss
     print("Expected Loss for random predictions: {}".format(np.log(vocabulary_size)))
     print("Actual loss: {}".format(model.calculate_loss(X_train[:10000], y_train[:10000])))
-
 
     # check the gradient calculation
     grad_check_vocab_size = 100
