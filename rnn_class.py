@@ -1,5 +1,4 @@
 import numpy as np
-import operator
 
 
 class rnn_numpy:
@@ -32,13 +31,12 @@ class rnn_numpy:
         return [o, s]
 
     def predict(self, x):
-        # perform forward propagation and return index of the hightest score
+        # perform forward propagation and return index of the highest score
         o, s = self.forward_propagation(x)
         return np.argmax(o, axis=1)
 
     def calculate_total_loss(self, x, y):
         L = 0
-
         for i in np.arange(len(y)):
             o, s = self.forward_propagation(x[i])
             corrected_word_predictions = o[np.arange(len(y[i])), y[i]]
@@ -51,7 +49,6 @@ class rnn_numpy:
 
     def bptt(self, x, y):
         T = len(y)
-
         o, s = self.forward_propagation(x)
         dLdU = np.zeros(self.U.shape)
         dLdV = np.zeros(self.V.shape)
